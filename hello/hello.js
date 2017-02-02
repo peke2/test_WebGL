@@ -4,6 +4,8 @@ var vertexPositionAttribute;
 var vertexColorAttribute;
 var shaderProgram;
 
+var rotation_deg;
+
 function start()
 {
 	var canvas = document.getElementById("glcanvas");
@@ -53,6 +55,8 @@ function start()
 	gl.enableVertexAttribArray(vertexColorAttribute);
 
 	initBuffer();
+
+	rotation_deg = 0;
 
 	setInterval(drawScene, 16);
 }
@@ -145,6 +149,14 @@ function applyMatrix()
 	vec3.set(trans, 0,0,-5);
 	mat4.translate(viewMatrix, viewMatrix, trans);
 
+	var rad = rotation_deg/180.0*Math.PI;
+	var rotMatrix = mat4.create();
+	rotMatrix[0] = Math.cos(rad);
+	rotMatrix[1] = Math.sin(rad);
+	rotMatrix[4] = -Math.sin(rad);
+	rotMatrix[5] = Math.cos(rad);
+	mat4.multiply(viewMatrix, viewMatrix, rotMatrix);
+
 	var uniform = gl.getUniformLocation(shaderProgram, "viewMatrix");
 	gl.uniformMatrix4fv(uniform, false, new Float32Array(viewMatrix));
 
@@ -158,18 +170,14 @@ function drawScene()
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 	applyMatrix();
-	
+
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 	gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 	gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 	gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 3);
-/*
-	gl.begin(gl.TRIANGLES);
-	gl.vertex(0,0.578,0);
-	gl.vertex(-0.5,-0.288,0);
-	gl.vertex(0.5,-0.288,0);
-	gl.end();
-	*/
+
+	rotation_deg += 1;
+	rotation_deg = rotation_deg%360;
 }
 
