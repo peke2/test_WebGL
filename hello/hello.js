@@ -175,7 +175,8 @@ function drawScene()
 	gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 	gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 	gl.vertexAttribPointer(vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
-	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 3);
+	//gl.drawArrays(gl.TRIANGLE_STRIP, 0, 3);
+	gl.drawArrays(gl.LINE_LOOP, 0, 3);
 
 	rotation_deg += 1;
 	rotation_deg = rotation_deg%360;
