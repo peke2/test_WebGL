@@ -58,6 +58,11 @@ function start()
 
 	rotation_deg = 0;
 
+	this.grid = new Grid(gl);
+	this.camera = new Camera();
+	this.camera.setPos(0.5, 1.5, 2);
+	this.camera.lookAt(0, 0, 0);
+
 	setInterval(drawScene, 16);
 }
 
@@ -146,7 +151,32 @@ function applyMatrix()
 	mat4.perspective(projMatrix, Math.PI/180.0*45, aspect, near, far);
 
 	var trans = vec3.create();
-	vec3.set(trans, 0,0,-5);
+	vec3.set(trans, 0,-1,-5);
+	mat4.translate(viewMatrix, viewMatrix, trans);
+
+	viewMatrix = this.camera.calcMatrix();
+
+
+	var uniform = gl.getUniformLocation(shaderProgram, "viewMatrix");
+	gl.uniformMatrix4fv(uniform, false, new Float32Array(viewMatrix));
+
+	uniform = gl.getUniformLocation(shaderProgram, "projMatrix");
+	gl.uniformMatrix4fv(uniform, false, new Float32Array(projMatrix));
+}
+
+
+function rotateTriangle()
+{
+	var viewMatrix = mat4.create();
+	var projMatrix = mat4.create();
+
+	var aspect = 640.0/480.0;
+	var near = 0.5;
+	var far = 500.0;
+	mat4.perspective(projMatrix, Math.PI/180.0*45, aspect, near, far);
+
+	var trans = vec3.create();
+	vec3.set(trans, 0,-1,-5);
 	mat4.translate(viewMatrix, viewMatrix, trans);
 
 	var rad = rotation_deg/180.0*Math.PI;
@@ -171,6 +201,9 @@ function drawScene()
 
 	applyMatrix();
 
+	this.grid.draw(gl);
+
+	rotateTriangle();
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 	gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
 	gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
